@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">IOT_Home</string>
+    <string name="app_name">Smart Home System</string>
     <string name="default_notification_channel_id">fcm</string>
     <string name="fcm_message">Broiler Firm</string>
 </resources>

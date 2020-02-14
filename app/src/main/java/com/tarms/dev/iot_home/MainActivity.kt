@@ -9,6 +9,7 @@ import android.media.RingtoneManager
 import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
 import androidx.core.app.NotificationCompat
 import androidx.databinding.DataBindingUtil
 import com.google.firebase.database.FirebaseDatabase
@@ -36,7 +37,39 @@ class MainActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
         FirebaseMessaging.getInstance().isAutoInitEnabled = true
+        subscribeToPusher()
 
+        val firm = Firm(
+            Temperature(Date().time, 29.0F, 80.4F),
+            Light("bulb1", true),
+            Fans("fan1", false),
+            Motor("motor1", false),
+            Pump("pump1", false)
+        )
+
+        val ref = FirebaseDatabase.getInstance().reference
+            .child("user/mazharul_sabbir/")
+            .child(Date().time.toString())
+
+//        ref.setValue(
+//            firm
+//        )
+
+        binding.firm = firm
+
+        findViewById<CardView>(R.id.light).setOnClickListener {
+            firm.light.l_status = !firm.light.l_status
+            binding.invalidateAll()
+        }
+
+        findViewById<CardView>(R.id.pump).setOnClickListener {
+            firm.pump.p_status = !firm.pump.p_status
+            binding.invalidateAll()
+        }
+
+    }
+
+    private fun subscribeToPusher() {
         PushNotifications.start(applicationContext, INSTANCE_ID)
         PushNotifications.addDeviceInterest("hello")
 
@@ -51,25 +84,6 @@ class MainActivity : AppCompatActivity() {
                 }
 
             })
-
-        val firm = Firm(
-            Temperature(Date().time, 29.0F, 80.4F),
-            Light("bulb1", false),
-            Fans("fan1", false),
-            Motor("motor1", false),
-            Pump("pump1", false)
-        )
-
-        val ref = FirebaseDatabase.getInstance().reference
-            .child("user/mazharul_sabbir/")
-            .child(Date().time.toString())
-
-        ref.setValue(
-            firm
-        )
-
-        binding.firm = firm
-
     }
 
     /**

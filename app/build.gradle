@@ -50,4 +50,7 @@ dependencies {
 
     //pusher for push notification from nodemcu
     implementation 'com.pusher:push-notifications-android:1.6.2'
+
+    //material design
+    implementation 'com.google.android.material:material:1.0.0'
 }
