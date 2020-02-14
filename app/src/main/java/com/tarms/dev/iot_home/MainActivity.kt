@@ -8,14 +8,17 @@ import android.content.Intent
 import android.media.RingtoneManager
 import android.os.Build
 import android.os.Bundle
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
-import com.google.firebase.iid.FirebaseInstanceId
+import androidx.databinding.DataBindingUtil
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.RemoteMessage
 import com.pusher.pushnotifications.PushNotificationReceivedListener
 import com.pusher.pushnotifications.PushNotifications
+import com.tarms.dev.iot_home.data.*
+import com.tarms.dev.iot_home.databinding.ActivityMainBinding
+import java.util.*
 import java.util.logging.Logger
 
 class MainActivity : AppCompatActivity() {
@@ -26,19 +29,13 @@ class MainActivity : AppCompatActivity() {
         const val TAG = "MainActivity"
     }
 
+    private lateinit var binding: ActivityMainBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
         FirebaseMessaging.getInstance().isAutoInitEnabled = true
-
-        FirebaseInstanceId.getInstance().instanceId.addOnCompleteListener {
-            if (it.isSuccessful) {
-                findViewById<TextView>(R.id.text_view).apply {
-                    text = it.result.toString()
-                }
-            }
-        }
 
         PushNotifications.start(applicationContext, INSTANCE_ID)
         PushNotifications.addDeviceInterest("hello")
@@ -54,6 +51,25 @@ class MainActivity : AppCompatActivity() {
                 }
 
             })
+
+        val firm = Firm(
+            Temperature(Date().time, 29.0F, 80.4F),
+            Light("bulb1", false),
+            Fans("fan1", false),
+            Motor("motor1", false),
+            Pump("pump1", false)
+        )
+
+        val ref = FirebaseDatabase.getInstance().reference
+            .child("user/mazharul_sabbir/")
+            .child(Date().time.toString())
+
+        ref.setValue(
+            firm
+        )
+
+        binding.firm = firm
+
     }
 
     /**

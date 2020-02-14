@@ -11,4 +11,5 @@ This is an automated firm management application for a firm by managing time to 
 
 ## Maintainer
 
-Mazharul Sabbir ([@mazharulsabbir](https://github.com/mazharulsabbir)) & Tanbir Ahmed Rabin ([@rsrobin](https://github.com/RsRobin77))
+* Mazharul Sabbir ([@mazharulsabbir](https://github.com/mazharulsabbir))
+* Tanbir Ahmed Rabin ([@rsrobin](https://github.com/RsRobin77))
