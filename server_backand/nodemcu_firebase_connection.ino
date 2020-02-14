@@ -1,21 +1,21 @@
 #include <ESP8266WiFi.h>
 #include <FirebaseArduino.h>
-#include <FirebaseCloudMessaging.h>
+#include <ESP8266HTTPClient.h>
 
 // Set these to run example.
 #define FIREBASE_HOST "iot-abs.firebaseio.com"
 #define FIREBASE_AUTH "sKrgUqedBmRkSqiwCDT6CQ0fYcw2dU50n7gkiCYB"
-//#define WIFI_SSID "Software Section"
-//#define WIFI_PASSWORD "diu123456"
 
 #define WIFI_SSID "Mazharul Sabbir"
 #define WIFI_PASSWORD "beniasohokola632294"
 
-#define SERVER_KEY "AAAARAT7mqU:APA91bHVd239UHrbFpotFlDE0GLRC_Bv79yVPtUGvWaXUyrhrscv8jDSP6k4ABgJJWAmrR2Vwc1jHVmVGtJW0XNVmsVbHXWUUvIG84Qj-_XJsGgiM9JwoA_byXs1NwNDwCuCrqoTR77b"
-#define CLIENT_REGISTRATION_ID "key_from_client_after_registration"
+#define BASE_URL "https://fcm.googleapis.com/fcm/send"
+
+int temp_output_pin = A0;
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(9600);
+  Serial.setDebugOutput(true);
 
   // connect to wifi.
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
@@ -28,92 +28,84 @@ void setup() {
   Serial.print("connected: ");
   Serial.println(WiFi.localIP());
 
-  FirebaseCloudMessaging fcm(SERVER_KEY);
-  FirebaseCloudMessage message =
-    FirebaseCloudMessage::SimpleNotification("Automated Broiler Firm", "Wifi Connected!");
-  FirebaseError error = fcm.SendMessageToUser(CLIENT_REGISTRATION_ID, message);
-  if (error) {
-    Serial.print("Error:");
-    Serial.print(error.code());
-    Serial.print(" :: ");
-    Serial.println(error.message().c_str());
-  } else {
-    Serial.println("Sent OK!");
-  }
-
   Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
+
+  Serial.println("Starting.....");
+
+  delay(1000);
 }
 
-int n = 0;
-
 void loop() {
+//  doitTOPIC("Broiler Firm","Notification is received!","fcmIOT");
+//
+//  delay(1000);
 
-  Serial.println(Firebase.getString("init"));
-  if (Firebase.failed()) {
+  temperature();
+
+  delay(1000);
+}
+
+void temperature(){
+    int analogValue = analogRead(temp_output_pin);
+    float millivolts = (analogValue/1024.0) * 3300; //3300 is the voltage provided by NodeMCU
+    float celsius = millivolts/10;
+    Serial.print("in DegreeC=   ");
+    Serial.println(celsius);
+
+    // set value
+    Firebase.setFloat("celsius", celsius);
+    // handle error
+    if (Firebase.failed()) {
+      Serial.print("setting /celsius failed:");
+      Serial.println(Firebase.error());
+      return;
+    }
+    delay(1000);
+
+//---------- Here is the calculation for Fahrenheit ----------//
+
+    float fahrenheit = ((celsius * 9)/5 + 32);
+    Serial.print(" in Farenheit=   ");
+    Serial.println(fahrenheit);
+
+    // set value
+    Firebase.setFloat("fahrenheit",fahrenheit);
+    // handle error
+    if (Firebase.failed()) {
+      Serial.print("setting /temp failed:");
+      Serial.println(Firebase.error());
+      return;
+    }
+    delay(1000);
+}
+
+void doitTOPIC(String title, String body,String topics) {
+  WiFiClient cli;
+  HTTPClient mClient;  
+  
+  String data = "{";
+  data = data + "\"to\": \"/topics/" + topics + "\",";
+  data = data + "\"notification\": {";
+  data = data + "\"body\": \"" + body + "\",";
+  data = data + "\"title\" : \"" + title + "\" ";
+  data = data + "} }";
+
+  mClient.begin(BASE_URL,"");
+  mClient.addHeader("Authorization", "key=AAAARAT7mqU:APA91bHVd239UHrbFpotFlDE0GLRC_Bv79yVPtUGvWaXUyrhrscv8jDSP6k4ABgJJWAmrR2Vwc1jHVmVGtJW0XNVmsVbHXWUUvIG84Qj-_XJsGgiM9JwoA_byXs1NwNDwCuCrqoTR77b");
+  mClient.addHeader("Content-Type", "application/json");
+  
+  int code = mClient.POST(data);
+  mClient.writeToStream(&Serial);
+
+ if(code>0){
+    Serial.print("Response Code: "+code);
+    Serial.println(mClient.getString());
+    
+    mClient.end();
+  }else{
     Serial.print("Error: ");
-    Serial.println(Firebase.error());
+    Serial.println(mClient.errorToString(code).c_str());
+    mClient.end();
     return;
   }
-  delay(1000);
-
-  // set value
-  Firebase.setFloat("number", 42.0);
-  // handle error
-  if (Firebase.failed()) {
-    Serial.print("setting /number failed:");
-    Serial.println(Firebase.error());
-    return;
-  }
-  delay(1000);
-//
-//  // update value
-//  Firebase.setFloat("number", 43.0);
-//  // handle error
-//  if (Firebase.failed()) {
-//    Serial.print("setting /number failed:");
-//    Serial.println(Firebase.error());
-//    return;
-//  }
-//  delay(1000);
-//
-//  // get value
-//  Serial.print("number: ");
-//  Serial.println(Firebase.getFloat("number"));
-//  delay(1000);
-//  //
-//  //  // remove value
-//  //  Firebase.remove("number");
-//  //  delay(1000);
-//
-//  // set string value
-//  Firebase.setString("message", "hello world");
-//  // handle error
-//  if (Firebase.failed()) {
-//    Serial.print("setting /message failed:");
-//    Serial.println(Firebase.error());
-//    return;
-//  }
-//  delay(1000);
-//
-//  // set bool value
-//  Firebase.setBool("truth", false);
-//  // handle error
-//  if (Firebase.failed()) {
-//    Serial.print("setting /truth failed:");
-//    Serial.println(Firebase.error());
-//    return;
-//  }
-//  delay(1000);
-//
-//  // append a new value to /logs
-//  String name = Firebase.pushInt("logs", n++);
-//  // handle error
-//  if (Firebase.failed()) {
-//    Serial.print("pushing /logs failed:");
-//    Serial.println(Firebase.error());
-//    return;
-//  }
-//  Serial.print("pushed: /logs/");
-//  Serial.println(name);
-//  delay(1000);
 }
