@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <import type="android.view.View" />
+
+        <variable
+            name="firm"
+            type="com.tarms.dev.iot_home.model.MyViewModel" />
+
+        <variable
+            name="clickHandler"
+            type="com.tarms.dev.iot_home.service.ClickEventListener" />
+    </data>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/light"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?selectableItemBackground"
+                android:onClick="@{(v)->clickHandler.onViewClick(v)}"
+                app:cardCornerRadius="8dp">
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp">
+
+                    <ImageView
+                        android:id="@+id/light_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/ic_circle"
+                        android:padding="12dp"
+                        android:src="@drawable/ic_bulb_outline" />
+
+                    <TextView
+                        android:id="@+id/light_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_toEndOf="@id/light_icon"
+                        android:hint="Light"
+                        android:text="@{firm.currentData.light.l_name}"
+                        android:textSize="18sp" />
+
+                    <ImageView
+                        android:id="@+id/checked"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_toEndOf="@id/light_name"
+                        android:src="@drawable/ic_checkmark_circle_2"
+                        android:visibility="@{firm.currentData.light.l_status? View.VISIBLE:View.INVISIBLE}" />
+
+                    <TextView
+                        android:id="@+id/status"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/light_name"
+                        android:layout_marginStart="16dp"
+                        android:layout_toEndOf="@id/light_icon"
+                        android:hint="status"
+                        android:text="@{String.valueOf(firm.currentData.light.l_status)}" />
+                </RelativeLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/pump"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?selectableItemBackground"
+                android:onClick="@{(v)->clickHandler.onViewClick(v)}"
+                app:cardCornerRadius="8dp">
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp">
+
+                    <ImageView
+                        android:id="@+id/pump_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/ic_circle"
+                        android:padding="12dp"
+                        android:src="@drawable/ic_thermometer_outline" />
+
+                    <TextView
+                        android:id="@+id/pump_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_toEndOf="@id/pump_icon"
+                        android:hint="Pump"
+                        android:text="@{firm.currentData.pump.p_name}"
+                        android:textSize="18sp" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_toEndOf="@id/pump_name"
+                        android:src="@drawable/ic_checkmark_circle_2"
+                        android:visibility="@{firm.currentData.pump.p_status? View.VISIBLE:View.INVISIBLE}" />
+
+                    <TextView
+                        android:id="@+id/status2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/pump_name"
+                        android:layout_marginStart="16dp"
+                        android:layout_toEndOf="@id/pump_icon"
+                        android:hint="status"
+                        android:text="@{String.valueOf(firm.currentData.pump.p_status)}" />
+                </RelativeLayout>
+
+            </androidx.cardview.widget.CardView>
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+</layout>
