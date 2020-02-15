@@ -1,3 +1,6 @@
 package com.tarms.dev.iot_home.data
 
-data class Motor(val m_name: String, val m_status: Boolean)
+import com.google.firebase.database.IgnoreExtraProperties
+
+@IgnoreExtraProperties
+data class Motor(var m_name: String? = "", var m_status: Boolean? = false)

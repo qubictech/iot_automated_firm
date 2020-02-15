@@ -1,3 +1,3 @@
 package com.tarms.dev.iot_home.data
 
-data class Temperature(val time: Long, val c_temp: Float,val f_temp:Float)
+data class Temperature(var time: Long? = 0, var c_temp: Float? = 0F,var f_temp:Float? = 0F)

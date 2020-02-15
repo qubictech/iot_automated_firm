@@ -33,7 +33,7 @@
             android:value="@string/default_notification_channel_id" />
 
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.MainActivity"
             android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

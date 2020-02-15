@@ -1,3 +1,6 @@
 package com.tarms.dev.iot_home.data
 
-data class Pump(val p_name: String, var p_status: Boolean)
+import com.google.firebase.database.IgnoreExtraProperties
+
+@IgnoreExtraProperties
+data class Pump(var p_name: String? = "", var p_status: Boolean? = false)

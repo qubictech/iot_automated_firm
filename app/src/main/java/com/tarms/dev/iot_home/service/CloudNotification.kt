@@ -11,31 +11,31 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import com.tarms.dev.iot_home.MainActivity
 import com.tarms.dev.iot_home.R
+import com.tarms.dev.iot_home.ui.MainActivity
 import java.util.logging.Logger
 
 const val TAG = "CloudNotification"
 
 class CloudNotification : FirebaseMessagingService() {
-    override fun onMessageReceived(msg: RemoteMessage?) {
-        super.onMessageReceived(msg)
+    override fun onMessageReceived(p0: RemoteMessage) {
+        super.onMessageReceived(p0)
 
-        msg?.data?.isNotEmpty().let {
-            Log.d(TAG, msg?.data.toString())
+        p0.data.isNotEmpty().let {
+            Log.d(TAG, p0.data.toString())
             Logger.getLogger("Notification Data: ").warning("Received")
 
             sendNotification(
-                msg?.notification?.title.toString(),
-                msg?.notification?.body.toString()
+                p0.notification?.title.toString(),
+                p0.notification?.body.toString()
             )
         }
     }
 
-    override fun onNewToken(token: String?) {
-        super.onNewToken(token)
+    override fun onNewToken(p0: String) {
+        super.onNewToken(p0)
 
-        Log.d(TAG, token.toString())
+        Log.d(TAG, p0)
     }
 
     /**

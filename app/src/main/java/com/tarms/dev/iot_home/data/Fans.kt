@@ -1,3 +1,6 @@
 package com.tarms.dev.iot_home.data
 
-data class Fans(val f_name:String,val f_status:Boolean)
+import com.google.firebase.database.IgnoreExtraProperties
+
+@IgnoreExtraProperties
+data class Fans(var f_name:String? = "",var f_status:Boolean? = false)

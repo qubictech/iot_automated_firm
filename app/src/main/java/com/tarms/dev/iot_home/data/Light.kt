@@ -1,3 +1,6 @@
 package com.tarms.dev.iot_home.data
 
-data class Light(val l_name: String, var l_status: Boolean)
+import com.google.firebase.database.IgnoreExtraProperties
+
+@IgnoreExtraProperties
+data class Light(var l_name: String = "", var l_status: Boolean? = false)

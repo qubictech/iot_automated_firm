@@ -8,7 +8,7 @@
 
         <variable
             name="firm"
-            type="com.tarms.dev.iot_home.data.Firm" />
+            type="com.tarms.dev.iot_home.model.MyViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -66,7 +66,7 @@
                             android:layout_marginStart="16dp"
                             android:layout_toEndOf="@id/light_icon"
                             android:hint="Light"
-                            android:text="@{firm.light.l_name}"
+                            android:text="@{firm.currentData.light.l_name}"
                             android:textSize="18sp" />
 
                         <ImageView
@@ -76,7 +76,7 @@
                             android:layout_marginStart="8dp"
                             android:layout_toEndOf="@id/light_name"
                             android:src="@drawable/ic_checkmark_circle_2"
-                            android:visibility="@{firm.light.l_status? View.VISIBLE:View.INVISIBLE}" />
+                            android:visibility="@{firm.currentData.light.l_status? View.VISIBLE:View.INVISIBLE}" />
 
                         <TextView
                             android:id="@+id/status"
@@ -86,7 +86,7 @@
                             android:layout_marginStart="16dp"
                             android:layout_toEndOf="@id/light_icon"
                             android:hint="status"
-                            android:text="@{String.valueOf(firm.light.l_status)}" />
+                            android:text="@{String.valueOf(firm.currentData.light.l_status)}" />
                     </RelativeLayout>
 
                 </androidx.cardview.widget.CardView>
@@ -121,7 +121,7 @@
                             android:layout_marginStart="16dp"
                             android:layout_toEndOf="@id/pump_icon"
                             android:hint="Pump"
-                            android:text="@{firm.pump.p_name}"
+                            android:text="@{firm.currentData.pump.p_name}"
                             android:textSize="18sp" />
 
                         <ImageView
@@ -130,7 +130,7 @@
                             android:layout_marginStart="8dp"
                             android:layout_toEndOf="@id/pump_name"
                             android:src="@drawable/ic_checkmark_circle_2"
-                            android:visibility="@{firm.pump.p_status? View.VISIBLE:View.INVISIBLE}" />
+                            android:visibility="@{firm.currentData.pump.p_status? View.VISIBLE:View.INVISIBLE}" />
 
                         <TextView
                             android:id="@+id/status2"
@@ -140,7 +140,7 @@
                             android:layout_marginStart="16dp"
                             android:layout_toEndOf="@id/pump_icon"
                             android:hint="status"
-                            android:text="@{String.valueOf(firm.pump.p_status)}" />
+                            android:text="@{String.valueOf(firm.currentData.pump.p_status)}" />
                     </RelativeLayout>
 
                 </androidx.cardview.widget.CardView>
