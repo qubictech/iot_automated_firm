@@ -2,9 +2,9 @@ package com.tarms.dev.iot_home.model
 
 import androidx.lifecycle.ViewModel
 import com.tarms.dev.iot_home.data.Firm
-import com.tarms.dev.iot_home.utils.FirmRepository
+import com.tarms.dev.iot_home.data.FirmRepository
 
-class MyViewModel : ViewModel() {
+class MyViewModel() : ViewModel() {
 
     fun getFirmData() = FirmRepository.getFirmData()
 

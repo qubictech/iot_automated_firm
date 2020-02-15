@@ -1,8 +1,7 @@
-package com.tarms.dev.iot_home.utils
+package com.tarms.dev.iot_home.data
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.tarms.dev.iot_home.data.Firm
 
 object FirmRepository {
 

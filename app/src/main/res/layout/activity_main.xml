@@ -9,6 +9,10 @@
         <variable
             name="firm"
             type="com.tarms.dev.iot_home.model.MyViewModel" />
+
+        <variable
+            name="clickHandler"
+            type="com.tarms.dev.iot_home.service.ClickEventListener" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -42,6 +46,7 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="8dp"
                     android:clickable="true"
+                    android:onClick="@{(v)->clickHandler.onViewClick(v)}"
                     android:focusable="true"
                     android:foreground="?selectableItemBackground"
                     app:cardCornerRadius="8dp">
@@ -98,6 +103,7 @@
                     android:layout_margin="8dp"
                     android:clickable="true"
                     android:focusable="true"
+                    android:onClick="@{(v)->clickHandler.onViewClick(v)}"
                     android:foreground="?selectableItemBackground"
                     app:cardCornerRadius="8dp">
 

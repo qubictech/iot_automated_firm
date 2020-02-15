@@ -8,9 +8,11 @@ import android.content.Intent
 import android.media.RingtoneManager
 import android.os.Build
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.firebase.database.*
 import com.google.firebase.messaging.FirebaseMessaging
@@ -21,10 +23,13 @@ import com.tarms.dev.iot_home.R
 import com.tarms.dev.iot_home.data.Firm
 import com.tarms.dev.iot_home.databinding.ActivityMainBinding
 import com.tarms.dev.iot_home.model.MyViewModel
+import com.tarms.dev.iot_home.service.ClickEventListener
 import com.tarms.dev.iot_home.utils.Utils
 import java.util.logging.Logger
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), ClickEventListener {
+
+    lateinit var myViewModel: MyViewModel
 
     companion object {
         const val PUSHER_INSTANCE_ID = "c1601c60-0369-4ef2-a111-f0b58ab33841"
@@ -33,19 +38,26 @@ class MainActivity : AppCompatActivity() {
         const val TAG = "MainActivity"
     }
 
-    private lateinit var binding: ActivityMainBinding
+    lateinit var firm: Firm
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        /*---------------PUSH NOTIFICATION USING PUSHER----------------*/
         PushNotifications.start(
             applicationContext,
             PUSHER_INSTANCE_ID
         )
         PushNotifications.addDeviceInterest("hello")
 
-        val myViewModel = ViewModelProvider(this@MainActivity).get(MyViewModel::class.java)
+        pushNotification()
+
+        /*---------------PUSH NOTIFICATION USING PUSHER----------------*/
+
+        /*---------------ANDROID LIVE DATA WITH DATA BINDING----------------*/
+
+        myViewModel = ViewModelProvider(this@MainActivity).get(MyViewModel::class.java)
 
         DataBindingUtil.setContentView<ActivityMainBinding>(
             this,
@@ -53,11 +65,25 @@ class MainActivity : AppCompatActivity() {
         ).apply {
             this.lifecycleOwner = this@MainActivity
             this.firm = myViewModel
+            this.clickHandler = this@MainActivity
         }
 
-        FirebaseMessaging.getInstance().isAutoInitEnabled = true
-        pushNotification()
+        myViewModel.getCurrentData().observe(this, Observer {
+            firm = it
+        })
 
+        /*---------------ANDROID LIVE DATA WITH DATA BINDING----------------*/
+
+        /*---------------SYNC DATA WITH FIREBASE DATABASE----------------*/
+
+        FirebaseMessaging.getInstance().isAutoInitEnabled = true
+
+        initDatabase()
+
+        /*---------------SYNC DATA WITH FIREBASE DATABASE----------------*/
+    }
+
+    private fun initDatabase() {
         val mRef = FirebaseDatabase.getInstance().reference.child(Utils.ref("mazharul_sabbir"))
 
         val dataList: MutableList<Firm> = mutableListOf()
@@ -84,6 +110,19 @@ class MainActivity : AppCompatActivity() {
             }
         }
         mRef.addValueEventListener(valueEventListener)
+    }
+
+    override fun onViewClick(view: View) {
+        val mRef = FirebaseDatabase.getInstance().reference.child(Utils.ref("mazharul_sabbir"))
+            .child("1581694698821")
+        when (view.id) {
+            R.id.light -> firm.light.l_status = !firm.light.l_status!!
+
+            R.id.pump -> firm.pump.p_status = !firm.pump.p_status!!
+
+        }
+
+        mRef.setValue(firm)
     }
 
     private fun pushNotification() {
@@ -141,4 +180,5 @@ class MainActivity : AppCompatActivity() {
 
         notificationManager.notify(0 /* ID of notification */, notificationBuilder.build())
     }
+
 }
