@@ -35,9 +35,9 @@
             app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 
             <LinearLayout
-                android:gravity="center"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:gravity="center"
                 android:orientation="horizontal">
 
                 <androidx.cardview.widget.CardView
@@ -46,9 +46,9 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="8dp"
                     android:clickable="true"
-                    android:onClick="@{(v)->clickHandler.onViewClick(v)}"
                     android:focusable="true"
                     android:foreground="?selectableItemBackground"
+                    android:onClick="@{(v)->clickHandler.onViewClick(v)}"
                     app:cardCornerRadius="8dp">
 
                     <RelativeLayout
@@ -103,8 +103,8 @@
                     android:layout_margin="8dp"
                     android:clickable="true"
                     android:focusable="true"
-                    android:onClick="@{(v)->clickHandler.onViewClick(v)}"
                     android:foreground="?selectableItemBackground"
+                    android:onClick="@{(v)->clickHandler.onViewClick(v)}"
                     app:cardCornerRadius="8dp">
 
                     <RelativeLayout

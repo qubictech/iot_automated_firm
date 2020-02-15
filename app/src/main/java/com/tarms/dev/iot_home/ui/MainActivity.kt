@@ -9,6 +9,7 @@ import android.media.RingtoneManager
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 import androidx.databinding.DataBindingUtil
@@ -122,7 +123,13 @@ class MainActivity : AppCompatActivity(), ClickEventListener {
 
         }
 
-        mRef.setValue(firm)
+        mRef.setValue(firm).addOnCompleteListener {
+            if (it.isSuccessful) {
+                Toast.makeText(
+                    applicationContext, "Changed!", Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
     }
 
     private fun pushNotification() {
