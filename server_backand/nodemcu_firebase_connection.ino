@@ -33,16 +33,26 @@ void setup() {
   Serial.println("Starting.....");
 
   delay(1000);
+
+  pinMode(D7, OUTPUT);     
 }
 
 void loop() {
-//  doitTOPIC("Broiler Firm","Notification is received!","fcmIOT");
-//
-//  delay(1000);
-
+//  fcmNotification("Broiler Firm","Notification is received!","fcmIOT");
+  ledBulbStatus();
   temperature();
+}
 
-  delay(1000);
+void ledBulbStatus(){
+  if(Firebase.getBool("user/mazharul_sabbir/firm_data/1581694698821/light/l_status")){
+    digitalWrite(D7, HIGH);
+    Serial.println("LED D7 On");
+  }else{
+    digitalWrite(D7, LOW);
+    Serial.println("LED D7 OFF");
+  }
+
+  delay(100);
 }
 
 void temperature(){
@@ -53,14 +63,13 @@ void temperature(){
     Serial.println(celsius);
 
     // set value
-    Firebase.setFloat("celsius", celsius);
+    Firebase.setFloat("user/mazharul_sabbir/firm_data/1581694698821/temp/c_temp", celsius);
     // handle error
     if (Firebase.failed()) {
       Serial.print("setting /celsius failed:");
       Serial.println(Firebase.error());
       return;
     }
-    delay(1000);
 
 //---------- Here is the calculation for Fahrenheit ----------//
 
@@ -69,17 +78,17 @@ void temperature(){
     Serial.println(fahrenheit);
 
     // set value
-    Firebase.setFloat("fahrenheit",fahrenheit);
+    Firebase.setFloat("user/mazharul_sabbir/firm_data/1581694698821/temp/f_temp",fahrenheit);
     // handle error
     if (Firebase.failed()) {
       Serial.print("setting /temp failed:");
       Serial.println(Firebase.error());
       return;
     }
-    delay(1000);
+    delay(300);
 }
 
-void doitTOPIC(String title, String body,String topics) {
+void fcmNotification(String title, String body,String topics) {
   WiFiClient cli;
   HTTPClient mClient;  
   
