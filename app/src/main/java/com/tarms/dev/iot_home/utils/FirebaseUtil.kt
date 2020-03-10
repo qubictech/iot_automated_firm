@@ -28,9 +28,9 @@ object FirebaseUtil {
         })
     }
 
-    fun getLatestData(onDataChange: (Firm) -> Unit){
+    fun getLatestData(onDataChange: (Firm, String) -> Unit) {
         val query = databaseReference.orderByKey().limitToLast(1)
-        query.addValueEventListener(object :ValueEventListener{
+        query.addValueEventListener(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {
                 println(p0.message)
             }
@@ -38,7 +38,9 @@ object FirebaseUtil {
             override fun onDataChange(snapshot: DataSnapshot) {
                 snapshot.children.map { dataSnapshot ->
                     dataSnapshot.getValue<Firm>(Firm::class.java)?.let {
-                        onDataChange(it)
+                        onDataChange(
+                            it, dataSnapshot.key.toString()
+                        )
                     }
                 }
             }

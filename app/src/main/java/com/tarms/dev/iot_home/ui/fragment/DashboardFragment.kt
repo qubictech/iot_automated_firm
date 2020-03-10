@@ -17,12 +17,15 @@ import com.tarms.dev.iot_home.data.Firm
 import com.tarms.dev.iot_home.databinding.FragmentDashboardBinding
 import com.tarms.dev.iot_home.repository.MyViewModel
 import com.tarms.dev.iot_home.service.ClickEventListener
+import com.tarms.dev.iot_home.service.TAG
 import com.tarms.dev.iot_home.utils.FirebaseUtil
 import com.tarms.dev.iot_home.utils.Utils
+import java.util.logging.Logger
 
 class DashboardFragment : Fragment(), ClickEventListener {
     lateinit var myViewModel: MyViewModel
     lateinit var firm: Firm
+    private var key = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -54,14 +57,19 @@ class DashboardFragment : Fragment(), ClickEventListener {
             this.firm = firm
         })
 
-        FirebaseUtil.getLatestData {
-            myViewModel.updateCurrentData(it)
+        FirebaseUtil.getLatestData { firm, key ->
+            myViewModel.updateCurrentData(firm)
+            this.key = key
         }
     }
 
     override fun onViewClick(view: View) {
+        if (key.isEmpty()) return
+
+        Logger.getLogger("onViewClick").warning("NODE KEY: $key")
+
         val mRef = FirebaseDatabase.getInstance().reference.child(Utils.firmRef("mazharul_sabbir"))
-            .child("1581694698821")
+            .child(key)
 
         when (view.id) {
             R.id.light -> try {

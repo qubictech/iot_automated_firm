@@ -8,10 +8,6 @@ interface Utils {
             return "user/$uid/firm_data/"
         }
 
-        fun userRef(uid: String): String {
-            return "user/$uid/user_data/"
-        }
-
         val numberFormat = DecimalFormat("##.##")
     }
 }
