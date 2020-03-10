@@ -23,9 +23,6 @@ import com.tarms.dev.iot_home.utils.Utils
 class DashboardFragment : Fragment(), ClickEventListener {
     lateinit var myViewModel: MyViewModel
     lateinit var firm: Firm
-    private val mRef =
-        FirebaseDatabase.getInstance().reference.child(Utils.firmRef("mazharul_sabbir"))
-    private lateinit var valueEventListener: ValueEventListener
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -53,42 +50,37 @@ class DashboardFragment : Fragment(), ClickEventListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        myViewModel.getCurrentData().observe(this, Observer {
-            firm = it
+        myViewModel.getCurrentData().observe(this, Observer { firm ->
+            this.firm = firm
         })
 
-        FirebaseUtil.getFirmInfo {
-            myViewModel.updateFirmData(it)
+        FirebaseUtil.getFirmInfo { firms ->
+            myViewModel.updateFirmData(firms)
         }
-    }
-
-    override fun onStart() {
-        super.onStart()
     }
 
     override fun onViewClick(view: View) {
         val mRef = FirebaseDatabase.getInstance().reference.child(Utils.firmRef("mazharul_sabbir"))
             .child("1581694698821")
+
         when (view.id) {
-            R.id.light -> firm.light.l_status = !firm.light.l_status!!
+            R.id.light -> try {
+                firm.light.l_status = !firm.light.l_status!!
+            } catch (e: UninitializedPropertyAccessException) {
+                e.printStackTrace()
+            }
 
-            R.id.pump -> firm.pump.p_status = !firm.pump.p_status!!
-
+            R.id.pump -> try {
+                firm.pump.p_status = !firm.pump.p_status!!
+            } catch (e: UninitializedPropertyAccessException) {
+                e.printStackTrace()
+            }
         }
 
         mRef.setValue(firm).addOnCompleteListener {
             if (it.isSuccessful) {
-                Toast.makeText(
-                    context, "Changed!", Toast.LENGTH_SHORT
-                ).show()
+                println("<=================Switch state changed!!=================>")
             }
         }
     }
-
-    override fun onDestroy() {
-        super.onDestroy()
-
-        mRef.removeEventListener(valueEventListener)
-    }
-
 }
