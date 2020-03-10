@@ -17,6 +17,10 @@ class MyViewModel() : ViewModel() {
         FirmRepository.updateFirmData(firm)
     }
 
+    fun updateCurrentData(firm: Firm){
+        FirmRepository.updateCurrentData(firm)
+    }
+
     companion object {
         @SuppressLint("SetTextI18n")
         @BindingAdapter("android:convertTempFloatToString")

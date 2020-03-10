@@ -54,8 +54,8 @@ class DashboardFragment : Fragment(), ClickEventListener {
             this.firm = firm
         })
 
-        FirebaseUtil.getFirmInfo { firms ->
-            myViewModel.updateFirmData(firms)
+        FirebaseUtil.getLatestData {
+            myViewModel.updateCurrentData(it)
         }
     }
 

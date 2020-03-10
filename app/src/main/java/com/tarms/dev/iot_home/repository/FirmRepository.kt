@@ -17,6 +17,10 @@ object FirmRepository {
         currentFirmData.value = firmData.value?.get(0)
     }
 
+    fun updateCurrentData(firm: Firm) {
+        currentFirmData.value = firm
+    }
+
     fun getFirmData(): LiveData<List<Firm>> {
         return firmData
     }

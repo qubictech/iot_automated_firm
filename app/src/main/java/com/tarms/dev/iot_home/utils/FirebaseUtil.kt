@@ -10,7 +10,7 @@ object FirebaseUtil {
     private val databaseReference =
         FirebaseDatabase.getInstance().reference.child(Utils.firmRef("mazharul_sabbir"))
 
-    fun getFirmInfo(onDataChange: (List<Firm>) -> Unit) {
+    fun getAllData(onDataChange: (List<Firm>) -> Unit) {
         databaseReference.addValueEventListener(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {
                 println(p0.message)
@@ -24,6 +24,23 @@ object FirebaseUtil {
                 }
 
                 onDataChange(firmList)
+            }
+        })
+    }
+
+    fun getLatestData(onDataChange: (Firm) -> Unit){
+        val query = databaseReference.orderByKey().limitToLast(1)
+        query.addValueEventListener(object :ValueEventListener{
+            override fun onCancelled(p0: DatabaseError) {
+                println(p0.message)
+            }
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+                snapshot.children.map { dataSnapshot ->
+                    dataSnapshot.getValue<Firm>(Firm::class.java)?.let {
+                        onDataChange(it)
+                    }
+                }
             }
         })
     }
