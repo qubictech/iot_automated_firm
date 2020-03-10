@@ -1,8 +1,8 @@
-package com.tarms.dev.iot_home.model
+package com.tarms.dev.iot_home.repository
 
 import androidx.lifecycle.ViewModel
 import com.tarms.dev.iot_home.data.Firm
-import com.tarms.dev.iot_home.data.FirmRepository
+import com.tarms.dev.iot_home.repository.FirmRepository
 
 class MyViewModel() : ViewModel() {
 

@@ -7,7 +7,7 @@
 
         <variable
             name="firm"
-            type="com.tarms.dev.iot_home.model.MyViewModel" />
+            type="com.tarms.dev.iot_home.repository.MyViewModel" />
 
         <variable
             name="clickHandler"

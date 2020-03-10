@@ -15,13 +15,11 @@ import com.google.firebase.database.*
 import com.tarms.dev.iot_home.R
 import com.tarms.dev.iot_home.data.Firm
 import com.tarms.dev.iot_home.databinding.FragmentDashboardBinding
-import com.tarms.dev.iot_home.model.MyViewModel
+import com.tarms.dev.iot_home.repository.MyViewModel
 import com.tarms.dev.iot_home.service.ClickEventListener
+import com.tarms.dev.iot_home.utils.FirebaseUtil
 import com.tarms.dev.iot_home.utils.Utils
 
-/**
- * A simple [Fragment] subclass.
- */
 class DashboardFragment : Fragment(), ClickEventListener {
     lateinit var myViewModel: MyViewModel
     lateinit var firm: Firm
@@ -58,12 +56,14 @@ class DashboardFragment : Fragment(), ClickEventListener {
         myViewModel.getCurrentData().observe(this, Observer {
             firm = it
         })
+
+        FirebaseUtil.getFirmInfo {
+            myViewModel.updateFirmData(it)
+        }
     }
 
     override fun onStart() {
         super.onStart()
-
-        initDatabase()
     }
 
     override fun onViewClick(view: View) {
@@ -83,34 +83,6 @@ class DashboardFragment : Fragment(), ClickEventListener {
                 ).show()
             }
         }
-    }
-
-
-    private fun initDatabase() {
-        val dataList: MutableList<Firm> = mutableListOf()
-
-        valueEventListener = object : ValueEventListener {
-
-            override fun onCancelled(error: DatabaseError) {
-                error.toException().printStackTrace()
-            }
-
-            override fun onDataChange(snapshot: DataSnapshot) {
-
-                dataList.clear()
-
-                try {
-                    snapshot.children.mapNotNullTo(dataList) {
-                        it.getValue<Firm>(Firm::class.java)
-                    }
-                } catch (e: DatabaseException) {
-                    e.printStackTrace()
-                }
-
-                myViewModel.updateFirmData(dataList)
-            }
-        }
-        mRef.addValueEventListener(valueEventListener)
     }
 
     override fun onDestroy() {

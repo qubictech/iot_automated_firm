@@ -13,7 +13,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 import androidx.databinding.DataBindingUtil
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.RemoteMessage
 import com.pusher.pushnotifications.PushNotificationReceivedListener
 import com.pusher.pushnotifications.PushNotifications
@@ -30,23 +29,12 @@ class MainActivity : AppCompatActivity(),
 
     companion object {
         const val PUSHER_INSTANCE_ID = "c1601c60-0369-4ef2-a111-f0b58ab33841"
-        const val PUSHER_SECRET_KEY =
-            "2C4063A7DFCF2A53F70F92D0D0116F9843E0283D21215D4D37F52622B33B72E9"
         const val TAG = "MainActivity"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         DataBindingUtil.setContentView<ActivityMainBinding>(this, R.layout.activity_main)
-
-        /*---------------PUSH NOTIFICATION USING PUSHER----------------*/
-        PushNotifications.start(
-            applicationContext,
-            PUSHER_INSTANCE_ID
-        )
-        PushNotifications.addDeviceInterest("hello")
-
-        pushNotification()
 
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
@@ -55,9 +43,11 @@ class MainActivity : AppCompatActivity(),
         }
 
         findViewById<BottomNavigationView>(R.id.bottom_nav).setOnNavigationItemSelectedListener(this)
-    }
 
-    private fun pushNotification() {
+        /*---------------PUSH NOTIFICATION USING PUSHER----------------*/
+        PushNotifications.start(applicationContext, PUSHER_INSTANCE_ID)
+        PushNotifications.addDeviceInterest("hello")
+
         PushNotifications.setOnMessageReceivedListenerForVisibleActivity(
             this,
             object : PushNotificationReceivedListener {
