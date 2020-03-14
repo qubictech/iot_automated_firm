@@ -11,6 +11,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.tarms.dev.iot_home.R
 import com.tarms.dev.iot_home.data.Firm
@@ -23,17 +24,19 @@ import com.tarms.dev.iot_home.utils.Utils
 import java.util.logging.Logger
 
 class DashboardFragment : Fragment(), ClickEventListener {
-    lateinit var myViewModel: MyViewModel
-    lateinit var firm: Firm
+    private lateinit var auth: FirebaseAuth
+    private lateinit var myViewModel: MyViewModel
+    private lateinit var firm: Firm
     private var key = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        myViewModel = ViewModelProvider(this).get(MyViewModel::class.java)
 
+        auth = FirebaseAuth.getInstance()
+
+        myViewModel = ViewModelProvider(this).get(MyViewModel::class.java)
 
         val binding = DataBindingUtil.inflate<FragmentDashboardBinding>(
             inflater,
@@ -64,11 +67,16 @@ class DashboardFragment : Fragment(), ClickEventListener {
     }
 
     override fun onViewClick(view: View) {
-        if (key.isEmpty()) return
+        if (key.isEmpty() || auth.uid == null) {
+            if (auth.uid == null)
+                Toast.makeText(context, "Login First!", Toast.LENGTH_SHORT).show()
+            return
+        }
 
-        Logger.getLogger("onViewClick").warning("NODE KEY: $key")
+        Logger.getLogger("onViewClick").warning("KEY: $key")
 
-        val mRef = FirebaseDatabase.getInstance().reference.child(Utils.firmRef("mazharul_sabbir"))
+        val mRef = FirebaseDatabase.getInstance()
+            .reference.child(Utils.firmRef(auth.uid.toString()))
             .child(key)
 
         when (view.id) {
