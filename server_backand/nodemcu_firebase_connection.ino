@@ -1,120 +1,90 @@
 #include <ESP8266WiFi.h>
 #include <FirebaseArduino.h>
-#include <ESP8266HTTPClient.h>
 
-// Set these to run example.
+#include "DHT.h"
+#include <Wire.h>
+
+#include "ThingSpeak.h"
+
+// Set these to run firebase.
 #define FIREBASE_HOST "iot-abs.firebaseio.com"
-#define FIREBASE_AUTH "sKrgUqedBmRkSqiwCDT6CQ0fYcw2dU50n7gkiCYB"
+#define FIREBASE_AUTH "m4dS7dKquNI4s9zrE7B36eUnxizaKA6Se8OYBG95"
+#define FIREBASE_USER_REFERENCE""
 
-#define WIFI_SSID "Mazharul Sabbir"
-#define WIFI_PASSWORD "beniasohokola632294"
+// Wifi name and password
+#define WIFI_SSID "MERCUSYS"
+#define WIFI_PASSWORD "beniasohokola123"
 
-#define BASE_URL "https://fcm.googleapis.com/fcm/send"
+// ThinkSpeak api
+#define CHANNEL_NUMBER 1125511
+#define WRITE_API_KEY "GLRPZJZ768UMGPA8"
+#define READ_API_KEY "H1X7OCPWB21LMY7U"
 
-int temp_output_pin = A0;
+// Temperature and Humidity sensor
+#define DHTPIN 0
+#define DHTTYPE DHT11
+
+DHT dht(DHTPIN, DHTTYPE);
+WiFiClient  client;
 
 void setup() {
-  Serial.begin(9600);
-  Serial.setDebugOutput(true);
+  Serial.begin(115200);
+  delay(100);
+  dht.begin();
+  ThingSpeak.begin(client);
 
-  // connect to wifi.
+  Serial.print("Connecting to ");
+  Serial.println(WIFI_SSID);
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-  Serial.print("connecting");
+
   while (WiFi.status() != WL_CONNECTED) {
-    Serial.print("..");
     delay(500);
+    Serial.print(".");
   }
-  Serial.println();
-  Serial.print("connected: ");
+
+  Serial.println("WiFi is connected");
+
   Serial.println(WiFi.localIP());
-
   Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
+}
 
-  Serial.println("Starting.....");
+void getFirebaseData() {
+  Firebase.getString(FIREBASE_USER_REFERENCE);
+}
 
-  delay(1000);
+void storeThinkSpeakData() {
+  // Read temperature as Celsius (the default)
+  float temp = dht.readTemperature();
 
-  pinMode(D7, OUTPUT);     
+  // Write value to Field 1 of a ThingSpeak Channel
+  int httpCode = ThingSpeak.writeField(CHANNEL_NUMBER, 1, temp, WRITE_API_KEY);
+
+  if (httpCode == 200) {
+    Serial.println("Channel write successful.");
+  }
+  else {
+    Serial.println("Problem writing to channel. HTTP error code " + String(httpCode));
+  }
+
+  // Wait 20 seconds to update the channel again
+  delay(20000);
+
+  // read humidity data
+  float humidity = dht.readHumidity();
+  // Write value to Field 2 of a ThingSpeak Channel
+  int result = ThingSpeak.writeField(CHANNEL_NUMBER, 2, humidity, WRITE_API_KEY);
+
+  if (result == 200) {
+    Serial.println("Channel write successful.");
+  }
+  else {
+    Serial.println("Problem writing to channel. HTTP error code " + String(httpCode));
+  }
+
+  // Wait 20 seconds to update the channel again
+  delay(20000);
 }
 
 void loop() {
-//  fcmNotification("Broiler Firm","Notification is received!","fcmIOT");
-  ledBulbStatus();
-  temperature();
-}
-
-void ledBulbStatus(){
-  if(Firebase.getBool("user/mazharul_sabbir/firm_data/1581694698821/light/l_status")){
-    digitalWrite(D7, HIGH);
-    Serial.println("LED D7 On");
-  }else{
-    digitalWrite(D7, LOW);
-    Serial.println("LED D7 OFF");
-  }
-
-  delay(100);
-}
-
-void temperature(){
-    int analogValue = analogRead(temp_output_pin);
-    float millivolts = (analogValue/1024.0) * 3300; //3300 is the voltage provided by NodeMCU
-    float celsius = millivolts/10;
-    Serial.print("in DegreeC=   ");
-    Serial.println(celsius);
-
-    // set value
-    Firebase.setFloat("user/mazharul_sabbir/firm_data/1581694698821/temp/c_temp", celsius);
-    // handle error
-    if (Firebase.failed()) {
-      Serial.print("setting /celsius failed:");
-      Serial.println(Firebase.error());
-      return;
-    }
-
-//---------- Here is the calculation for Fahrenheit ----------//
-
-    float fahrenheit = ((celsius * 9)/5 + 32);
-    Serial.print(" in Farenheit=   ");
-    Serial.println(fahrenheit);
-
-    // set value
-    Firebase.setFloat("user/mazharul_sabbir/firm_data/1581694698821/temp/f_temp",fahrenheit);
-    // handle error
-    if (Firebase.failed()) {
-      Serial.print("setting /temp failed:");
-      Serial.println(Firebase.error());
-      return;
-    }
-    delay(300);
-}
-
-void fcmNotification(String title, String body,String topics) {
-  WiFiClient cli;
-  HTTPClient mClient;  
-  
-  String data = "{";
-  data = data + "\"to\": \"/topics/" + topics + "\",";
-  data = data + "\"notification\": {";
-  data = data + "\"body\": \"" + body + "\",";
-  data = data + "\"title\" : \"" + title + "\" ";
-  data = data + "} }";
-
-  mClient.begin(BASE_URL,"");
-  mClient.addHeader("Authorization", "key=AAAARAT7mqU:APA91bHVd239UHrbFpotFlDE0GLRC_Bv79yVPtUGvWaXUyrhrscv8jDSP6k4ABgJJWAmrR2Vwc1jHVmVGtJW0XNVmsVbHXWUUvIG84Qj-_XJsGgiM9JwoA_byXs1NwNDwCuCrqoTR77b");
-  mClient.addHeader("Content-Type", "application/json");
-  
-  int code = mClient.POST(data);
-  mClient.writeToStream(&Serial);
-
- if(code>0){
-    Serial.print("Response Code: "+code);
-    Serial.println(mClient.getString());
-    
-    mClient.end();
-  }else{
-    Serial.print("Error: ");
-    Serial.println(mClient.errorToString(code).c_str());
-    mClient.end();
-    return;
-  }
+  storeThinkSpeakData();
 }
