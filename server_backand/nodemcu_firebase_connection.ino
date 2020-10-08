@@ -9,7 +9,7 @@
 // Set these to run firebase.
 #define FIREBASE_HOST "iot-abs.firebaseio.com"
 #define FIREBASE_AUTH "m4dS7dKquNI4s9zrE7B36eUnxizaKA6Se8OYBG95"
-#define FIREBASE_USER_REFERENCE""
+#define FIREBASE_USER_REFERENCE "user/AoFjPjVl0DRyKrIwvqPZNBI6HZ32/firm_data/devices/"
 
 // Wifi name and password
 #define WIFI_SSID "MERCUSYS"
@@ -26,6 +26,8 @@
 
 DHT dht(DHTPIN, DHTTYPE);
 WiFiClient  client;
+
+int mLoopCount = 0;
 
 void setup() {
   Serial.begin(115200);
@@ -46,6 +48,15 @@ void setup() {
 
   Serial.println(WiFi.localIP());
   Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
+
+  // motor driver setup
+  //  setupMotorDriverL293D();
+}
+
+void setupMotorDriverL293D() {
+  // pinMode(D0, OUTPUT); // enable pin
+  pinMode(D1, OUTPUT); // input pin
+  pinMode(D2, OUTPUT); // input pin
 }
 
 void getFirebaseData() {
@@ -53,38 +64,48 @@ void getFirebaseData() {
 }
 
 void storeThinkSpeakData() {
-  // Read temperature as Celsius (the default)
-  float temp = dht.readTemperature();
 
-  // Write value to Field 1 of a ThingSpeak Channel
-  int httpCode = ThingSpeak.writeField(CHANNEL_NUMBER, 1, temp, WRITE_API_KEY);
+  if (mLoopCount == 2) {
+    // Read temperature as Celsius (the default)
+    float temp = dht.readTemperature();
+    Serial.println("Temperature: ");
+    Serial.print(temp);
+    Serial.println();
 
-  if (httpCode == 200) {
-    Serial.println("Channel write successful.");
-  }
-  else {
-    Serial.println("Problem writing to channel. HTTP error code " + String(httpCode));
-  }
+    // Write value to Field 1 of a ThingSpeak Channel
+    int httpCode = ThingSpeak.writeField(CHANNEL_NUMBER, 1, temp, WRITE_API_KEY);
 
-  // Wait 20 seconds to update the channel again
-  delay(20000);
-
-  // read humidity data
-  float humidity = dht.readHumidity();
-  // Write value to Field 2 of a ThingSpeak Channel
-  int result = ThingSpeak.writeField(CHANNEL_NUMBER, 2, humidity, WRITE_API_KEY);
-
-  if (result == 200) {
-    Serial.println("Channel write successful.");
-  }
-  else {
-    Serial.println("Problem writing to channel. HTTP error code " + String(httpCode));
+    if (httpCode == 200) {
+      Serial.println("Channel write successful.");
+    }
+    else {
+      Serial.println("Problem writing to channel. HTTP error code " + String(httpCode));
+    }
   }
 
-  // Wait 20 seconds to update the channel again
-  delay(20000);
+  if (mLoopCount == 4) {
+    // read humidity data
+    float humidity = dht.readHumidity();
+    Serial.println("Humidity: ");
+    Serial.print(humidity);
+    Serial.println();
+
+    // Write value to Field 2 of a ThingSpeak Channel
+    int result = ThingSpeak.writeField(CHANNEL_NUMBER, 2, humidity, WRITE_API_KEY);
+
+    if (result == 200) {
+      Serial.println("Channel write successful.");
+    }
+    else {
+      Serial.println("Problem writing to channel. HTTP error code " + String(result));
+    }
+
+    mLoopCount = 0;
+  }
 }
 
 void loop() {
   storeThinkSpeakData();
+  mLoopCount++;
+  delay(1000);
 }
