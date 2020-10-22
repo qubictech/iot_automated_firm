@@ -6,6 +6,8 @@
 
 #include "ThingSpeak.h"
 
+#include <SoftwareSerial.h>
+
 // Set these to run firebase.
 #define FIREBASE_HOST "iot-abs.firebaseio.com"
 #define FIREBASE_AUTH "m4dS7dKquNI4s9zrE7B36eUnxizaKA6Se8OYBG95"
@@ -31,7 +33,9 @@ int mLoopCount = 0;
 
 void setup() {
   Serial.begin(115200);
+  Serial1.begin(115200);
   delay(100);
+
   dht.begin();
   ThingSpeak.begin(client);
 
@@ -44,6 +48,7 @@ void setup() {
     Serial.print(".");
   }
 
+
   Serial.println("WiFi is connected");
 
   Serial.println(WiFi.localIP());
@@ -51,6 +56,13 @@ void setup() {
 
   // motor driver setup
   //  setupMotorDriverL293D();
+
+  pinMode(D1, OUTPUT);
+  pinMode(D2, OUTPUT);
+  pinMode(D5, OUTPUT);
+  pinMode(D6, OUTPUT);
+  pinMode(D7, OUTPUT);
+  digitalWrite(D1, HIGH);
 }
 
 void setupMotorDriverL293D() {
@@ -60,7 +72,69 @@ void setupMotorDriverL293D() {
 }
 
 void getFirebaseData() {
-  Firebase.getString(FIREBASE_USER_REFERENCE);
+  String fanRef = String(FIREBASE_USER_REFERENCE) + String("device1/status");
+  String lightRef = String(FIREBASE_USER_REFERENCE) + String("device2/status");
+  String motorRef = String(FIREBASE_USER_REFERENCE) + String("device3/status");
+  String pumpRef = String(FIREBASE_USER_REFERENCE) + String("device4/status");
+
+  bool fanStatus = Firebase.getBool(fanRef);
+  bool lightStatus = Firebase.getBool(lightRef);
+  bool motorStatus = Firebase.getBool(motorRef);
+  bool pumpStatus = Firebase.getBool(pumpRef);
+
+  Serial.println(lightStatus);
+
+  if (fanStatus == true) {
+    digitalWrite(D1, LOW);
+    Serial.println("Fan on");
+
+    Serial1.print(1);
+  } else {
+    digitalWrite(D1, HIGH);
+    Serial.println("Fan off");
+
+    Serial1.print(2);
+  }
+
+  if (lightStatus == true) {
+    digitalWrite(D1, LOW);
+    Serial.println("Light on");
+
+    Serial1.print(3);
+  } else {
+    digitalWrite(D1, HIGH);
+    Serial.println("Light off");
+
+    Serial1.print(4);
+  }
+
+  if (motorStatus == true) {
+    digitalWrite(D1, LOW);
+    Serial.println("Motor on");
+
+    Serial1.print(5);
+  } else {
+    digitalWrite(D1, HIGH);
+    Serial.println("Motor off");
+
+    Serial1.print(6);
+  }
+
+  if (pumpStatus == true) {
+    digitalWrite(D1, LOW);
+    Serial.println("Pump on");
+
+    Serial1.print(7);
+  } else {
+    digitalWrite(D1, HIGH);
+    Serial.println("Pump off");
+
+    Serial1.print(8);
+  }
+
+  Serial.print("D1 Status");
+  Serial.println(digitalRead(D1));
+  delay(1000);
 }
 
 void storeThinkSpeakData() {
@@ -106,6 +180,17 @@ void storeThinkSpeakData() {
 
 void loop() {
   storeThinkSpeakData();
+  getFirebaseData();
   mLoopCount++;
+  digitalWrite(D1, HIGH);
+  digitalWrite(D2, HIGH);
+  digitalWrite(D5, HIGH);
+  digitalWrite(D6, HIGH);
+  digitalWrite(D7, HIGH);
   delay(1000);
+  digitalWrite(D1, LOW);
+  digitalWrite(D2, LOW);
+  digitalWrite(D5, LOW);
+  digitalWrite(D6, LOW);
+  digitalWrite(D7, LOW);
 }
